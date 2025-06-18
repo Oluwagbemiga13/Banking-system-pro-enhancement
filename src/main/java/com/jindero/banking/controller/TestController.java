@@ -1,0 +1,19 @@
+package com.jindero.banking.controller;
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class TestController {
+
+  @GetMapping("/")
+  public String hello(){
+    return "Banking System API is running";
+  }
+
+  @GetMapping("/test")
+  public String test(){
+    return "Spring Boot works perfectly!";
+  }
+}
