@@ -6,7 +6,7 @@ import jakarta.persistence.Entity;
 
 @Entity
 @DiscriminatorValue("BUSINESS")
-public class BusinessAccount extends Account implements dev.jov.Chargeable {
+public class BusinessAccount extends Account implements Chargeable {
 
   //Konstruktor
 

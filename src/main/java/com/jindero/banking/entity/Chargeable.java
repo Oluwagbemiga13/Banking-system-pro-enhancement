@@ -1,4 +1,4 @@
-package dev.jov;
+package com.jindero.banking.entity;
 
 public interface Chargeable {
 

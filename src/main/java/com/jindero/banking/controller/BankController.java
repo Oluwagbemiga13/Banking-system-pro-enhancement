@@ -16,7 +16,7 @@ public class BankController {
   @Autowired
   private BankService bankService;
 
-  // GET /api/accounts - všechnyy účty
+  // GET /api/accounts - všechny účty
   @GetMapping
   public List<Account> getAllAccounts(){
     return bankService.getAllAccounts();
