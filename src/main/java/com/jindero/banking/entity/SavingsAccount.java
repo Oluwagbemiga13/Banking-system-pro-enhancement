@@ -8,7 +8,7 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("SAVINGS")
 public class SavingsAccount extends Account {
 
-  //Konstuktor
+  //Konstruktor
 
   public SavingsAccount(){
     super();

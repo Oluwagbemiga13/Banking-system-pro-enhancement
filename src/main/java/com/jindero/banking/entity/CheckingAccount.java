@@ -8,7 +8,7 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("CHECKINGS")
 public class CheckingAccount extends Account implements Chargeable {
 
-  //Konstuktor
+  //Konstruktor
 
   public CheckingAccount(){
     super();

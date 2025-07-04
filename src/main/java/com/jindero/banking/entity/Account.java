@@ -22,7 +22,7 @@ public abstract class Account {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  //konstuktor
+  //konstruktor
 
 
   public Account() {
