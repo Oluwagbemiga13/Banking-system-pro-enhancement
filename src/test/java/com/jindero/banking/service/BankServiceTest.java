@@ -53,7 +53,7 @@ class BankServiceTest {
   void testCreateAccount_invalidSavingsAccount(){
 
     // účet
-    SavingsAccount account = new SavingsAccount("SAV002", "Test user",1000.0);
+    SavingsAccount account = new SavingsAccount("SAV001", "Test user",1000.0);
 
     // mock vrátí tento účet po zavolání save()
     when(accountRepository.save(any(SavingsAccount.class))).thenReturn(account);
