@@ -21,7 +21,7 @@ private final UserRepository userRepository;
     return userRepository.findAll();
     }
 
-    //Vyhledat Usera podle id
+    //Vyhledat User podle id
   public Optional<User> findById(Long id){
     if (id == null || id <= 0){
       return Optional.empty();
@@ -39,7 +39,7 @@ private final UserRepository userRepository;
     }
   }
 
-  // Vytvořit Usera
+  // Vytvořit User
   public User createUser(User user)  {
     if (userRepository.existsByEmail(user.getEmail())){
       throw new EmailAlreadyExistException("Email " + user.getEmail() + " already exists");
@@ -48,15 +48,16 @@ private final UserRepository userRepository;
     }
   }
 
-  //Update Usera
+  //Update User
   public User updateUser( Long id, User newUserData){
-    if (userRepository.existsById(id)){
 
-      if (userRepository.existsByEmail(newUserData.getEmail())){
+    User existingUser = userRepository.findById(id).get();
+
+    if (userRepository.existsById(id)){
+      if (!existingUser.getEmail().equals(newUserData.getEmail()) &&
+              userRepository.existsByEmail(newUserData.getEmail())){
         throw new EmailAlreadyExistException("Email " + newUserData.getEmail() + " already exists");
       }
-
-      User existingUser = userRepository.findById(id).get();
 
       existingUser.setFirstName(newUserData.getFirstName());
       existingUser.setLastName(newUserData.getLastName());
@@ -69,7 +70,7 @@ private final UserRepository userRepository;
     }
   }
 
-  //Smazat Usera
+  //Smazat User
   public void deleteUser(Long id){
     if (userRepository.existsById(id)){
 
