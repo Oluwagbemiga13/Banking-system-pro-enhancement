@@ -1,4 +1,4 @@
-package com.jindero.banking.exception;
+package com.jindero.banking.shared.exception;
 
 public class InsufficientFundsException extends RuntimeException {
 
