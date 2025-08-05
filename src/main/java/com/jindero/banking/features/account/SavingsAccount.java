@@ -1,6 +1,7 @@
-package com.jindero.banking.entity;
+package com.jindero.banking.features.account;
 
 
+import com.jindero.banking.features.user.User;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
@@ -14,8 +15,8 @@ public class SavingsAccount extends Account {
     super();
   }
 
-  public SavingsAccount(String accountNumber, String ownerName, double balance) {
-    super(accountNumber, ownerName, balance);
+  public SavingsAccount(String accountNumber, double balance, User user) {
+    super(accountNumber, balance, user);
   }
 
   @Override

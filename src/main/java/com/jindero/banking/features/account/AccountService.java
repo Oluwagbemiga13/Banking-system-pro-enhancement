@@ -1,34 +1,38 @@
-package com.jindero.banking.service;
+package com.jindero.banking.features.account;
 
 
-import com.jindero.banking.entity.Account;
-import com.jindero.banking.entity.BusinessAccount;
-import com.jindero.banking.entity.CheckingAccount;
-import com.jindero.banking.entity.SavingsAccount;
-import com.jindero.banking.exception.AccountNotFoundException;
-import com.jindero.banking.exception.InsufficientFundsException;
-import com.jindero.banking.repository.AccountRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.jindero.banking.features.user.User;
+import com.jindero.banking.features.user.UserRepository;
+import com.jindero.banking.shared.exception.AccountNotFoundException;
+import com.jindero.banking.shared.exception.InsufficientFundsException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class BankService {
+public class AccountService {
 
-  @Autowired
   private AccountRepository accountRepository;
+  private UserRepository userRepository;
+
+  public AccountService(AccountRepository accountRepository, UserRepository userRepository) {
+    this.accountRepository = accountRepository;
+    this.userRepository = userRepository;
+  }
 
   //vytvořit account
 
-  public Account createAccount(String accountType, String accountNumber,
-                               String ownerName, double initialBalance){
+  public Account createAccount(Long userId,String accountType,
+                               String accountNumber, double initialBalance){
+
+    User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User with ID " + userId + " not found"));
 
     Account account =  switch (accountType.toUpperCase()){
-      case "SAVINGS" -> new SavingsAccount(accountNumber, ownerName, initialBalance);
-      case "CHECKING" -> new CheckingAccount(accountNumber, ownerName, initialBalance);
-      case "BUSINESS" -> new BusinessAccount(accountNumber, ownerName, initialBalance);
+      case "SAVINGS" -> new SavingsAccount(accountNumber, initialBalance, user);
+      case "CHECKING" -> new CheckingAccount(accountNumber, initialBalance,user);
+      case "BUSINESS" -> new BusinessAccount(accountNumber, initialBalance,user);
       default -> throw new IllegalArgumentException("Invalid account type: " + accountType);
     };
     return accountRepository.save(account);

@@ -1,6 +1,7 @@
-package com.jindero.banking.entity;
+package com.jindero.banking.features.account;
 
 
+import com.jindero.banking.features.user.User;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
@@ -14,8 +15,8 @@ public class CheckingAccount extends Account implements Chargeable {
     super();
   }
 
-  public CheckingAccount(String accountNumber, String ownerName, double balance) {
-    super(accountNumber, ownerName, balance);
+  public CheckingAccount(String accountNumber,  double balance, User user) {
+    super(accountNumber, balance, user);
   }
 
   @Override
