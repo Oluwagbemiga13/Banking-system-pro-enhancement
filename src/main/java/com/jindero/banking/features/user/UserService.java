@@ -9,75 +9,75 @@ import java.util.Optional;
 @Service
 public class UserService {
 
-private final UserRepository userRepository;
+    private final UserRepository userRepository;
 
-  public UserService(UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
 
-  // Vyhledat všechny Usery
-    public List<User> findAll(){
-    return userRepository.findAll();
+    // Vyhledat všechny Usery
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 
     //Vyhledat User podle id
-  public Optional<User> findById(Long id){
-    if (id == null || id <= 0){
-      return Optional.empty();
-    } else {
-      return userRepository.findById(id);
+    public Optional<User> findById(Long id) {
+        if (id == null || id <= 0) {
+            return Optional.empty();
+        } else {
+            return userRepository.findById(id);
+        }
     }
-  }
 
-  //Vyhledat podle emailu
-  public Optional<User> findByEmail(String email){
-    if (email == null){
-      return Optional.empty();
-    } else {
-      return userRepository.findByEmail(email);
+    //Vyhledat podle emailu
+    public Optional<User> findByEmail(String email) {
+        if (email == null) {
+            return Optional.empty();
+        } else {
+            return userRepository.findByEmail(email);
+        }
     }
-  }
 
-  // Vytvořit User
-  public User createUser(User user)  {
-    if (userRepository.existsByEmail(user.getEmail())){
-      throw new EmailAlreadyExistException("Email " + user.getEmail() + " already exists");
-    } else {
-      return userRepository.save(user);
+    // Vytvořit User
+    public User createUser(User user) {
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new EmailAlreadyExistException("Email " + user.getEmail() + " already exists");
+        } else {
+            return userRepository.save(user);
+        }
     }
-  }
 
-  //Update User
-  public User updateUser( Long id, User newUserData){
+    //Update User
+    public User updateUser(Long id, User newUserData) {
 
-    User existingUser = userRepository.findById(id).get();
+        User existingUser = userRepository.findById(id).get();
 
-    if (userRepository.existsById(id)){
-      if (!existingUser.getEmail().equals(newUserData.getEmail()) &&
-              userRepository.existsByEmail(newUserData.getEmail())){
-        throw new EmailAlreadyExistException("Email " + newUserData.getEmail() + " already exists");
-      }
+        if (userRepository.existsById(id)) {
+            if (!existingUser.getEmail().equals(newUserData.getEmail()) &&
+                    userRepository.existsByEmail(newUserData.getEmail())) {
+                throw new EmailAlreadyExistException("Email " + newUserData.getEmail() + " already exists");
+            }
 
-      existingUser.setFirstName(newUserData.getFirstName());
-      existingUser.setLastName(newUserData.getLastName());
-      existingUser.setPhoneNumber(newUserData.getPhoneNumber());
-      existingUser.setEmail(newUserData.getEmail());
+            existingUser.setFirstName(newUserData.getFirstName());
+            existingUser.setLastName(newUserData.getLastName());
+            existingUser.setPhoneNumber(newUserData.getPhoneNumber());
+            existingUser.setEmail(newUserData.getEmail());
 
-      return userRepository.save(existingUser);
-    } else {
-      throw new RuntimeException("User with ID " + id + " not found");
+            return userRepository.save(existingUser);
+        } else {
+            throw new RuntimeException("User with ID " + id + " not found");
+        }
     }
-  }
 
-  //Smazat User
-  public void deleteUser(Long id){
-    if (userRepository.existsById(id)){
+    //Smazat User
+    public void deleteUser(Long id) {
+        if (userRepository.existsById(id)) {
 
-      userRepository.deleteById(id);
-    } else {
-      throw new RuntimeException("User with ID "+ id + " not found");
+            userRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("User with ID " + id + " not found");
+        }
     }
-  }
 
 }

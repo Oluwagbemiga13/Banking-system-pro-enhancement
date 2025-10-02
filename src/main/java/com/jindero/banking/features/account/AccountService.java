@@ -13,74 +13,74 @@ import java.util.Optional;
 @Service
 public class AccountService {
 
-  private AccountRepository accountRepository;
-  private UserRepository userRepository;
+    private AccountRepository accountRepository;
+    private UserRepository userRepository;
 
-  public AccountService(AccountRepository accountRepository, UserRepository userRepository) {
-    this.accountRepository = accountRepository;
-    this.userRepository = userRepository;
-  }
-
-  //vytvořit account
-
-  public Account createAccount(Long userId,String accountType,
-                               String accountNumber, double initialBalance){
-
-    User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User with ID " + userId + " not found"));
-
-    Account account =  switch (accountType.toUpperCase()){
-      case "SAVINGS" -> new SavingsAccount(accountNumber, initialBalance, user);
-      case "CHECKING" -> new CheckingAccount(accountNumber, initialBalance,user);
-      case "BUSINESS" -> new BusinessAccount(accountNumber, initialBalance,user);
-      default -> throw new IllegalArgumentException("Invalid account type: " + accountType);
-    };
-    return accountRepository.save(account);
-  }
-
-  // Zobrazit všechny učty
-  public List<Account> getAllAccounts(){
-    return accountRepository.findAll();
-  }
-
-  // Najít účet pomocí ID
-  public Optional<Account> getAccountById(Long id){
-    if (id == null || id <= 0){
-      return Optional.empty();
-    }
-    return accountRepository.findById(id);
-  }
-
-  // Vložení peněz
-  public Account deposit(Long accountId, double amount){
-    if (amount <= 0){
-      throw new IllegalArgumentException("Deposit amount must be positive");
+    public AccountService(AccountRepository accountRepository, UserRepository userRepository) {
+        this.accountRepository = accountRepository;
+        this.userRepository = userRepository;
     }
 
-    Optional<Account> accountOpt = accountRepository.findById(accountId);
-    if (accountOpt.isPresent()){
-      Account account = accountOpt.get();
-      account.deposit(amount);
-      return accountRepository.save(account);
-    }
-    throw new AccountNotFoundException("Account with ID " + accountId + " not found");
-  }
+    //vytvořit account
 
-  // Výběr peněz
-  public Account withdraw(Long accountId,double amount){
-    if (amount <= 0){
-      throw new IllegalArgumentException("Withdrawal amount must be positive");
-    }
+    public Account createAccount(Long userId, String accountType,
+                                 String accountNumber, double initialBalance) {
 
-    Optional<Account> accountOpt = accountRepository.findById(accountId);
-    if (accountOpt.isPresent()){
-      Account account = accountOpt.get();
-      if (account.withdraw(amount)){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User with ID " + userId + " not found"));
+
+        Account account = switch (accountType.toUpperCase()) {
+            case "SAVINGS" -> new SavingsAccount(accountNumber, initialBalance, user);
+            case "CHECKING" -> new CheckingAccount(accountNumber, initialBalance, user);
+            case "BUSINESS" -> new BusinessAccount(accountNumber, initialBalance, user);
+            default -> throw new IllegalArgumentException("Invalid account type: " + accountType);
+        };
         return accountRepository.save(account);
-      }
-      throw  new InsufficientFundsException("Insufficient funds for withdrawal of " + amount);
     }
-    throw new AccountNotFoundException("Account with ID "+ accountId+ " not found");
-  }
+
+    // Zobrazit všechny učty
+    public List<Account> getAllAccounts() {
+        return accountRepository.findAll();
+    }
+
+    // Najít účet pomocí ID
+    public Optional<Account> getAccountById(Long id) {
+        if (id == null || id <= 0) {
+            return Optional.empty();
+        }
+        return accountRepository.findById(id);
+    }
+
+    // Vložení peněz
+    public Account deposit(Long accountId, double amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Deposit amount must be positive");
+        }
+
+        Optional<Account> accountOpt = accountRepository.findById(accountId);
+        if (accountOpt.isPresent()) {
+            Account account = accountOpt.get();
+            account.deposit(amount);
+            return accountRepository.save(account);
+        }
+        throw new AccountNotFoundException("Account with ID " + accountId + " not found");
+    }
+
+    // Výběr peněz
+    public Account withdraw(Long accountId, double amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Withdrawal amount must be positive");
+        }
+
+        Optional<Account> accountOpt = accountRepository.findById(accountId);
+        if (accountOpt.isPresent()) {
+            Account account = accountOpt.get();
+            if (account.withdraw(amount)) {
+                return accountRepository.save(account);
+            }
+            throw new InsufficientFundsException("Insufficient funds for withdrawal of " + amount);
+        }
+        throw new AccountNotFoundException("Account with ID " + accountId + " not found");
+    }
 
 }

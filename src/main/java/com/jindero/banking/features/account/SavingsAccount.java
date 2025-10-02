@@ -9,23 +9,23 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("SAVINGS")
 public class SavingsAccount extends Account {
 
-  //Konstruktor
+    //Konstruktor
 
-  public SavingsAccount(){
-    super();
-  }
+    public SavingsAccount() {
+        super();
+    }
 
-  public SavingsAccount(String accountNumber, double balance, User user) {
-    super(accountNumber, balance, user);
-  }
+    public SavingsAccount(String accountNumber, double balance, User user) {
+        super(accountNumber, balance, user);
+    }
 
-  @Override
-  public double calculateInterest() {
-    return balance * 0.02;
-  }
+    @Override
+    public double calculateInterest() {
+        return balance * 0.02;
+    }
 
-  @Override
-  public String getAccountType() {
-    return "Savings Account";
-  }
+    @Override
+    public String getAccountType() {
+        return "Savings Account";
+    }
 }
