@@ -12,101 +12,102 @@ import java.util.Objects;
 @DiscriminatorColumn(name = "account_type", discriminatorType = DiscriminatorType.STRING)
 public abstract class Account {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @Column(unique = true)
-  protected String accountNumber;
+    @Column(unique = true)
+    protected String accountNumber;
 
-  protected double balance;
+    protected double balance;
 
-  //Propojeni Account s User
-  @ManyToOne
-  @JoinColumn(name = "user_id")
-  private User user;
+    //Propojeni Account s User
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
-  //konstruktor
+    //konstruktor
 
-  public Account() {
-  }
-
-  public Account( String accountNumber, double balance, User user) {
-    this.accountNumber = accountNumber;
-    this.balance = balance;
-    this.user = user;
-  }
-
-  //Abstract metody
-  public abstract double calculateInterest();
-  public abstract String getAccountType();
-
-  //Metody
-  public void deposit(double amount) {
-    if (amount <= 0) {
-       System.out.println("Chyba! Zadej částku větší než 0!");
-       return;
+    public Account() {
     }
-    balance += amount;
-    System.out.println("Vloženo: " + amount + " Kč");
-  }
 
-  public boolean withdraw(double amount) {
-    if (amount > 0 && balance >= amount) {
-      balance -= amount;
-      System.out.println("Vybráno " + amount + " Kč");
-      return true;
+    public Account(String accountNumber, double balance, User user) {
+        this.accountNumber = accountNumber;
+        this.balance = balance;
+        this.user = user;
     }
-    System.out.println("Nedostatek prostředků");
-    return false;
-  }
 
-  //Getter
-  public double getBalance(){
-    return balance;
-  }
+    //Abstract metody
+    public abstract double calculateInterest();
 
-  public String getAccountNumber() {
-    return accountNumber;
-  }
+    public abstract String getAccountType();
 
-  public Long getId() {
-    return id;
-  }
+    //Metody
+    public void deposit(double amount) {
+        if (amount <= 0) {
+            System.out.println("Chyba! Zadej částku větší než 0!");
+            return;
+        }
+        balance += amount;
+        System.out.println("Vloženo: " + amount + " Kč");
+    }
 
-  public User getUser(){
-    return user;
-  }
+    public boolean withdraw(double amount) {
+        if (amount > 0 && balance >= amount) {
+            balance -= amount;
+            System.out.println("Vybráno " + amount + " Kč");
+            return true;
+        }
+        System.out.println("Nedostatek prostředků");
+        return false;
+    }
 
-  //Setter
+    //Getter
+    public double getBalance() {
+        return balance;
+    }
 
-  public void setId(Long id) {
-    this.id = id;
-  }
+    public String getAccountNumber() {
+        return accountNumber;
+    }
 
-  public void setUser(User user){
-    this.user = user;
-  }
+    public Long getId() {
+        return id;
+    }
 
-  @Override
-  public boolean equals(Object o) {
-    if (o == null || getClass() != o.getClass()) return false;
-    Account account = (Account) o;
-    return Objects.equals(id, account.id);
-  }
+    public User getUser() {
+        return user;
+    }
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(id);
-  }
+    //Setter
 
-  @Override
-  public String toString() {
-    return "Account{" +
-            "id=" + id +
-            ", accountNumber='" + accountNumber + '\'' +
-            ", balance=" + balance +
-            ", user=" + user +
-            '}';
-  }
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Account account = (Account) o;
+        return Objects.equals(id, account.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Account{" +
+                "id=" + id +
+                ", accountNumber='" + accountNumber + '\'' +
+                ", balance=" + balance +
+                ", user=" + user +
+                '}';
+    }
 }
