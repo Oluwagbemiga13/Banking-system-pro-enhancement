@@ -16,16 +16,7 @@ public class SavingsAccount extends Account {
     }
 
     public SavingsAccount(String accountNumber, double balance, User user) {
-        super(accountNumber, balance, user);
+        super(accountNumber, balance, user, AccountType.SAVINGS);
     }
 
-    @Override
-    public double calculateInterest() {
-        return balance * 0.02;
-    }
-
-    @Override
-    public String getAccountType() {
-        return "Savings Account";
-    }
 }

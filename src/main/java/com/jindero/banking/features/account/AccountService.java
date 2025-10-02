@@ -4,11 +4,10 @@ package com.jindero.banking.features.account;
 import com.jindero.banking.features.user.User;
 import com.jindero.banking.features.user.UserRepository;
 import com.jindero.banking.shared.exception.AccountNotFoundException;
-import com.jindero.banking.shared.exception.InsufficientFundsException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AccountService {
@@ -44,43 +43,41 @@ public class AccountService {
     }
 
     // Najít účet pomocí ID
-    public Optional<Account> getAccountById(Long id) {
-        if (id == null || id <= 0) {
-            return Optional.empty();
-        }
-        return accountRepository.findById(id);
-    }
+    // Tohle je zbytečná metoda, protože dělá to samé jako findById z JpaRepository
+//    public Optional<Account> getAccountById(Long id) {
+//        if (id == null || id <= 0) {
+//            return Optional.empty();
+//        }
+//        return accountRepository.findById(id);
+//    }
 
     // Vložení peněz
-    public Account deposit(Long accountId, double amount) {
+    public Account deposit(UUID accountId, double amount) {
         if (amount <= 0) {
             throw new IllegalArgumentException("Deposit amount must be positive");
         }
 
-        Optional<Account> accountOpt = accountRepository.findById(accountId);
-        if (accountOpt.isPresent()) {
-            Account account = accountOpt.get();
-            account.deposit(amount);
-            return accountRepository.save(account);
-        }
-        throw new AccountNotFoundException("Account with ID " + accountId + " not found");
+        Account account = getById(accountId);
+        account.deposit(amount);
+        return accountRepository.save(account);
+    }
+
+    // Touto metodou získám účet podle jeho UUID a pokud účet neexistuje, vyhodí výjimku AccountNotFoundException
+    public Account getById(UUID accountId) {
+        return accountRepository.findById(accountId)
+                .orElseThrow(() -> new AccountNotFoundException(accountId));
     }
 
     // Výběr peněz
-    public Account withdraw(Long accountId, double amount) {
+    // Tím že si vyjímky nechám vyhodit jinde, nemusím se tady o ně starat
+    public Account withdraw(UUID accountId, double amount) {
         if (amount <= 0) {
             throw new IllegalArgumentException("Withdrawal amount must be positive");
         }
+        Account account = getById(accountId);
+        account.withdraw(amount);
+        return accountRepository.save(account);
 
-        Optional<Account> accountOpt = accountRepository.findById(accountId);
-        if (accountOpt.isPresent()) {
-            Account account = accountOpt.get();
-            if (account.withdraw(amount)) {
-                return accountRepository.save(account);
-            }
-            throw new InsufficientFundsException("Insufficient funds for withdrawal of " + amount);
-        }
-        throw new AccountNotFoundException("Account with ID " + accountId + " not found");
     }
 
 }

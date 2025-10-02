@@ -2,24 +2,41 @@ package com.jindero.banking.features.account;
 
 
 import com.jindero.banking.features.user.User;
+import com.jindero.banking.shared.exception.InsufficientFundsException;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Table(name = "accounts")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "account_type", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorColumn(name = "discriminator_type", discriminatorType = DiscriminatorType.STRING)
 public abstract class Account {
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "account_type")
+    private AccountType accountType;
+
+    /*UUID je lepší než Long, protože je unikátní napříč všemi systémy a NENÍ předvídatelný.
+    (Takže někdo nemůže hádat ID a získat přístup k jinému účtu)
+     */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(unique = true)
     protected String accountNumber;
 
-    protected double balance;
+    /* BigDecimal je lepší než double pro finanční výpočty, protože poskytuje přesnost a eliminuje chyby zaokrouhlování,
+    které mohou nastat při použití double. Například:
+        double b = 0.1;
+        double c = 0.2;
+        System.out.println(b + c);
+        Výstup bude 0.30000000000000004 místo očekávaných 0.3
+     */
+    protected BigDecimal balance;
 
     //Propojeni Account s User
     @ManyToOne
@@ -27,20 +44,30 @@ public abstract class Account {
     private User user;
 
     //konstruktor
-
-    public Account() {
+    /*Abstract classes should not have public constructors. Constructors of abstract classes can only be called in constructors of their subclasses.
+    So there is no point in making them public. The protected modifier should be enough.
+    */
+    protected Account() {
     }
 
-    public Account(String accountNumber, double balance, User user) {
+    /*Abstract classes should not have public constructors. Constructors of abstract classes can only be called in constructors of their subclasses.
+    So there is no point in making them public. The protected modifier should be enough.
+    */
+    protected Account(String accountNumber, double balance, User user, AccountType accountType) {
+        this.accountType = accountType;
         this.accountNumber = accountNumber;
-        this.balance = balance;
+        this.balance = BigDecimal.valueOf(balance);
         this.user = user;
     }
 
-    //Abstract metody
-    public abstract double calculateInterest();
+    //Není potřeba mít ty metody abstract, když už máme AccountType enum
+    public BigDecimal calculateInterest() {
+        return balance.multiply(accountType.getInterestRate());
+    }
 
-    public abstract String getAccountType();
+    public AccountType getAccountType() {
+        return accountType;
+    }
 
     //Metody
     public void deposit(double amount) {
@@ -48,22 +75,27 @@ public abstract class Account {
             System.out.println("Chyba! Zadej částku větší než 0!");
             return;
         }
-        balance += amount;
+        balance = balance.add(BigDecimal.valueOf(amount));
         System.out.println("Vloženo: " + amount + " Kč");
     }
 
-    public boolean withdraw(double amount) {
-        if (amount > 0 && balance >= amount) {
-            balance -= amount;
-            System.out.println("Vybráno " + amount + " Kč");
-            return true;
+    // Metody co mají side effects by měly být void! To že se něco nepovede, se řeší výjimkou.
+    // Vyjímka by se měla vyhodit hned kdy nastane, proto je lepší to řešít už tady než v controlleru.
+    public void withdraw(double amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Chyba! Zadej částku větší než 0!");
         }
-        System.out.println("Nedostatek prostředků");
-        return false;
+        // metoda compareTo vrací -1, 0, nebo 1 pokud je menší, rovno, nebo větší než druhý operand
+        if (balance.compareTo(BigDecimal.valueOf(amount)) >= 0) {
+            // Pro jednoduchost se dá použít tento konstruktor s defaultní message.
+            throw new InsufficientFundsException();
+        }
+        balance = balance.subtract(BigDecimal.valueOf(amount));
+        System.out.println("Vybráno " + amount + " Kč");
     }
 
     //Getter
-    public double getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
@@ -71,7 +103,7 @@ public abstract class Account {
         return accountNumber;
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
@@ -80,14 +112,15 @@ public abstract class Account {
     }
 
     //Setter
+// Pro ID by neměl být setter, protože by to mohlo vést k nekonzistenci dat. ID by mělo být neměnné po vytvoření entity.
+//    public void setId(Long id) {
+//        this.id = id;
+//    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
+// Podle mne to samé, user by se neměl měnit.
+//    public void setUser(User user) {
+//        this.user = user;
+//    }
 
     @Override
     public boolean equals(Object o) {
